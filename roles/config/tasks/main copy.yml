@@ -1,0 +1,55 @@
+
+
+
+- name: config
+  containers.podman.podman_container_exec:
+    name: dns
+    argv:
+      - /bin/sh
+      - -c
+      - "echo // include '/etc/bind/zones.rfc1918';    \
+        {% for domain in domains %}     \
+        zone '{{domain}}' IN {  \
+              type master;     \
+              file '/etc/bind/zones/{{domain}}.de';    \
+                allow-query { any; };   \
+        #       allow-update { any; };  \
+        };      \
+        zone '0.116.10.in-addr.arpa' IN {       \
+              type master;     \
+              file /etc/bind/zones/{{domain}}.rev;     \
+                allow-query { any; };   \
+        #       allow-update { any; };  \
+        };      \
+        {% endfor %}
+        > /etc/bind/named.conf.local"
+
+      - "echo   acl local-lan {   \
+              localhost;  \
+        #      192.168.2.0/24;  \
+        #      192.168.120.0/24;  \
+                {% for subnet in subnets %} \
+                  {{ subnet }}; \
+                {% endfor %}  \
+              };  \
+              options { \
+              directory '/var/cache/bind';  \
+              forwarders {  \
+                {% for forwarder in forwarders %} \
+                  {{forwarder }}; \
+                {% endfor %}  \
+              #100.100.100.100; \
+                  # the tailscale dns \
+              };  \
+              allow-query { local-lan; 100.0.0.0/8 }; # Erlaubt Anfragen nur von den in local-lan definierten Netzwerken  \
+              dnssec-validation auto; \
+              auth-nxdomain no;    // conform to RFC1035  \
+              listen-on-v6 { any; };  \
+              recursion no;  // we set that to no to avoid unnecessary traffic  \
+              querylog yes; // Enable for debugging \
+              version 'not available'; // Disable for security  \
+              };   > /etc/bind/named.conf.options"
+    # env:
+    #   named_conf_local: "{{ lookup('template', 'named_conf_local.j2') }}"
+    #   named_conf_options:  "{{ lookup('template', 'named_conf_options.j2') }}"
+

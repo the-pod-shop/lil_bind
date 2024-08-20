@@ -1,0 +1,8 @@
+---
+yaml_path: "./yamlgen"
+group: ""
+store_yaml: "False"
+inventory_path: "./inventory"
+target_group: prototypes
+target_group_state: present
+target_group_gid: 1000

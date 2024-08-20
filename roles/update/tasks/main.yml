@@ -1,0 +1,17 @@
+- name: Create yamls
+  containers.podman.podman_container_exec:
+    name: dns
+    argv:
+      - /bin/sh
+      - -c
+      - |
+        {% for item in domains %}
+        /usr/bin/named-checkzone {{item.domain}} /etc/bind/zones/{{item.domain}}
+        /usr/bin/named-checkzone {{item.domain}}.rev /etc/bind/zones/{{item.domain}}.rev
+        {% endfor %}
+        named-checkconf /etc/bind/named.conf.options
+        /usr/bin/named-checkconf
+      #  /etc/init.d/named restart
+- name: restart container
+  ansible.builtin.command: |
+    podman restart {{container_name}}

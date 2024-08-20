@@ -1,0 +1,21 @@
+namespace: "ji_podhead"
+name: "lil_bind"
+description:  "a little collection that creates podman bind 9 container and lets you configure zones"
+version: "0.0.1"
+readme: "README.md"
+authors:
+    - "ji-podhead (https://https://www.github.com/ji-podhead)"
+dependencies:
+    community.general: ">=0.0.0"
+license:
+    - "MIT"
+tags:
+    - dns
+    - bind9
+    - podman
+    - baremetal
+
+repository: "https://www.github.com/the-pod-shop/lil_bind"
+
+
+

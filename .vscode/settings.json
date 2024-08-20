@@ -1,0 +1,6 @@
+{
+    "github-actions.workflows.pinned.workflows": [
+        ".github/workflows/galaxy_build.yml"
+    ],
+    "ansible.python.interpreterPath": "/bin/python"
+}

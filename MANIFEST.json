@@ -1,0 +1,39 @@
+{
+ "collection_info": {
+  "namespace": "ji_podhead",
+  "name": "host_prototypes",
+  "version": "0.0.5",
+  "authors": [
+   "ji-podhead (https://https://www.github.com/ji-podhead)"
+  ],
+  "readme": "README.md",
+  "tags": [
+     "host_prototypes",
+     "random_cloud_init_config",
+     "random_mac_and_random_pass",
+     "random_ssh_keys",
+     "dynamic_host_creation"
+    
+  ],
+  "description": "a little collection that creates hosts from prototypes. it also creates private,public keys, random mac and random pass",
+  "license": [
+   "MIT"
+  ],
+  "license_file": null,
+  "dependencies": {
+   "community.general": ">=0.0.0"
+  },
+  "repository": "https://www.github.com/the-pod-shop/host_prototypes",
+  "documentation": null,
+  "homepage": null,
+  "issues": null
+ },
+ "file_manifest_file": {
+  "name": "FILES.json",
+  "ftype": "file",
+  "chksum_type": "sha256",
+  "chksum_sha256": "4dba77037edf0a9797cb6442131087053481bb08275b2bc024b03c8ec315b777",
+  "format": 1
+ },
+ "format": 1
+}

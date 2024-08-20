@@ -1,0 +1,12 @@
+
+- name: Create yamls
+  ansible.builtin.command:  podman rm -f {{container_name}}
+
+- name: install bind9
+  containers.podman.podman_container:
+    name: "{{container_name}}"
+    image: docker.io/ubuntu/bind9:latest
+    state: started
+    ports:
+    - "30053:53"
+    - "30053:53/udp"

@@ -1,0 +1,89 @@
+- name: fick dich doch
+  debug:
+    msg: "fick dich doch"
+- name: ficvkdich zweimal 
+  debug:
+    msg: "{{domains}}"
+- name: get REVERSED_IP
+  register: REVERSED_IP
+  ansible.builtin.shell: |
+    {% for item in domains %} 
+    echo  {{ item.ip }} | awk -F. '{print $3"."$2"."$1}'
+    {% endfor %}
+- name: get ip Cut
+  register: CUT_IP
+  ansible.builtin.shell: |
+    {% for item in domains %} 
+    echo  {{ item.ip }} | awk -F. '{print $1"."$2"."$3}'
+    {% endfor %}
+
+- name: test REVERSED_IP
+  debug:
+    msg: "{{REVERSED_IP}}"
+
+
+- name: config
+  loop: "{{domains}}"
+  loop_control:
+    loop_var: item
+    index_var: i2
+
+  containers.podman.podman_container_exec:
+    name: "{{container_name}}"
+    argv:
+      - /bin/sh
+      - -c
+      - | 
+            
+            echo ---------------------- named_conf_local ----------------------   
+            cat << 'EOF' >> /etc/bind/named.conf.local   
+            zone "{{item.domain}}" IN {  
+                  type master;     
+                  file "/etc/bind/zones/{{item.domain}}";    
+                  allow-query { any; };   
+                  allow-update { any; };  
+            };      
+            zone "{{- REVERSED_IP.stdout_lines[i2]}}.in-addr.arpa" IN {       
+                  type master;     
+                  file "/etc/bind/zones/{{item.domain}}.rev";     
+                  allow-query { any; };   
+                  allow-update { any; };  
+            };      
+            EOF
+            cat /etc/bind/named.conf.local
+- name: config
+  containers.podman.podman_container_exec:
+    name: "{{container_name}}"
+    argv:
+      - /bin/sh
+      - -c
+      - | 
+            echo ---------------------- named_conf_options ----------------------
+            cat << 'EOF' > /etc/bind/named.conf.options
+            acl local-lan { 
+                localhost;
+                {% for subnet in subnets %}
+                {{- subnet }};
+                {% endfor %}
+            };
+            options {
+                directory "/var/cache/bind";
+                forwarders {
+                  {% for forwarder in forwarders %}
+                  {{- forwarder }};
+                  {% endfor %}
+                };
+                allow-query { 
+                {% for query in allow_queries %}
+                {{- query }};
+                {% endfor %}
+                };
+                dnssec-validation auto;
+                auth-nxdomain no;    // conform to RFC1035
+                listen-on-v6 { any; };
+                recursion no;  // we set that to no to avoid unnecessary traffic
+                querylog yes; // Enable for debugging
+                version "not available"; // Disable for security
+            }; 
+            EOF
+            cat etc/bind/named.conf.options
