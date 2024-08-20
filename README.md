@@ -10,6 +10,11 @@ lil_bind installs  Bind9 podman container and configures a ***static DNS*** for 
   
 i dont need a dhcp for my iac stuff, but still need a dns, so it was not intendet to make use of dynamic updates since all my containers and vms have a static ip because of the nic's (bridges/nats) anyway, so i decided just to use a tailscale router and instead of dhcp ill use a little netkwork manager that gives ip by the given zone. So i just have a preset file that contains all my zones and subnets and the networkmanager will cycle ips in the given subnet and zone.
 
+## Install
+```bash
+$ ansible-galaxy collection install ji_podhead.lil_bind
+```
+---
 
 ## Usage
 - import collection and use root
@@ -83,7 +88,6 @@ i dont need a dhcp for my iac stuff, but still need a dns, so it was not intende
 ######################################################
 #           /etc/bind/named.conf.local
 ######################################################
-
 //
 // Do any local configuration here
 //
@@ -116,6 +120,7 @@ zone "2.168.192.in-addr.arpa" IN {
       allow-query { any; };   
       allow-update { any; };  
 };
+
 ######################################################
 #           /etc/bind/named.conf.options
 ######################################################
@@ -140,7 +145,8 @@ options {
     recursion no;  // we set that to no to avoid unnecessary traffic
     querylog yes; // Enable for debugging
     version "not available"; // Disable for security
-}; 
+};
+ 
 ######################################################
 #             /etc/bind/zones/pod.com
 ######################################################
@@ -158,10 +164,10 @@ $TTL    604800
 @       IN      NS      dns.com.
 pod.com. IN  A  192.168.3.0
 tele.pod.com. IN  A  192.168.3.2
+
 ######################################################
 #           /etc/bind/zones/pod.com.rev
 ######################################################
-
 ;
 ; BIND reverse data file for local loopback interface
 ;
@@ -176,6 +182,7 @@ $TTL    604800
 @       IN      NS     dns.com.
 0 IN  PTR  pod.com.
 2    IN  PTR tele.pod.com.
+
 ######################################################
 #                /etc/bind/zones/test.com
 ######################################################
@@ -193,6 +200,7 @@ $TTL    604800
 @       IN      NS      dns.com.
 test.com. IN  A  192.168.2.120
 test.test.com. IN  A  192.168.2.121
+
 ######################################################
 #             /etc/bind/zones/test.com.rev
 ######################################################
