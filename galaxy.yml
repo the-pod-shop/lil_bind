@@ -1,7 +1,7 @@
 namespace: "ji_podhead"
 name: "lil_bind"
 description:  "a little collection that creates podman bind 9 container and lets you configure zones"
-version: "0.0.1"
+version: "0.0.4"
 readme: "README.md"
 authors:
     - "ji-podhead (https://https://www.github.com/ji-podhead)"

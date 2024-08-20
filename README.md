@@ -42,9 +42,13 @@ $ ansible-galaxy collection install ji_podhead.lil_bind
     - name: lil_bind
       vars:
           container_name: "dns"
-          container_ip: "{{192.168.50.0}}"        
+          container_ip: "192.168.22.2"        
           dns_admin: "admin"
           dns_domain: "dns.com"
+          bridge_name: "my_bridge"
+          bridge_ip_range: "192.168.22.128/25"
+          bridge_subnet: "192.168.22.0/24"
+          bridge_gateway: "192.168.22.1"
           domains: [
                       {
                         domain: "pod.com", ip: "192.168.3.0",
@@ -64,6 +68,10 @@ $ ansible-galaxy collection install ji_podhead.lil_bind
 - fire the collection
     ```yaml      
       block:
+      - name: create bridge
+        import_role:
+          name: ji_podhead.lil_bind.create_bridge
+
       - name: install bind9
         import_role: 
           name: ji_podhead.lil_bind.install

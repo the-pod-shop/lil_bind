@@ -1,6 +1,7 @@
 
-- name: Create yamls
+- name: remove old container
   ansible.builtin.command:  podman rm -f {{container_name}}
+
 
 - name: install bind9
   containers.podman.podman_container:
@@ -10,3 +11,6 @@
     ports:
     - "30053:53"
     - "30053:53/udp"
+    ip: "{{container_ip}}"
+    network: "{{bridge_name}}"
+      
