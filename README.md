@@ -79,3 +79,135 @@ i dont need a dhcp for my iac stuff, but still need a dns, so it was not intende
     --- 
 
 ## output
+```bash
+######################################################
+#           /etc/bind/named.conf.local
+######################################################
+
+//
+// Do any local configuration here
+//
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+//include "/etc/bind/zones.rfc1918";
+
+zone "pod.com" IN {  
+      type master;     
+      file "/etc/bind/zones/pod.com";    
+      allow-query { any; };   
+      allow-update { any; };  
+};      
+zone "3.168.192.in-addr.arpa" IN {       
+      type master;     
+      file "/etc/bind/zones/pod.com.rev";     
+      allow-query { any; };   
+      allow-update { any; };  
+};      
+zone "test.com" IN {  
+      type master;     
+      file "/etc/bind/zones/test.com";    
+      allow-query { any; };   
+      allow-update { any; };  
+};      
+zone "2.168.192.in-addr.arpa" IN {       
+      type master;     
+      file "/etc/bind/zones/test.com.rev";     
+      allow-query { any; };   
+      allow-update { any; };  
+};
+######################################################
+#           /etc/bind/named.conf.options
+######################################################
+acl local-lan { 
+    localhost;
+    192.168.0.0/16;
+    100.0.0.0/8;
+    };
+options {
+    directory "/var/cache/bind";
+    forwarders {
+      100.100.100.100;
+          };
+    allow-query { 
+    localhost;
+    192.168.0.0/16;
+    100.0.0.0/8;
+        };
+    dnssec-validation auto;
+    auth-nxdomain no;    // conform to RFC1035
+    listen-on-v6 { any; };
+    recursion no;  // we set that to no to avoid unnecessary traffic
+    querylog yes; // Enable for debugging
+    version "not available"; // Disable for security
+}; 
+######################################################
+#             /etc/bind/zones/pod.com
+######################################################
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     dns.com. admin. ( 
+                                        2    
+                                        604800     
+                                        86400   
+                                        2419200    
+                                        604800 )      
+;
+@       IN      NS      dns.com.
+pod.com. IN  A  192.168.3.0
+tele.pod.com. IN  A  192.168.3.2
+######################################################
+#           /etc/bind/zones/pod.com.rev
+######################################################
+
+;
+; BIND reverse data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     dns.com. admin. ( 
+                                        2    
+                                        604800     
+                                        86400   
+                                        2419200    
+                                        604800 )      
+;
+@       IN      NS     dns.com.
+0 IN  PTR  pod.com.
+2    IN  PTR tele.pod.com.
+######################################################
+#                /etc/bind/zones/test.com
+######################################################
+;
+; BIND data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     dns.com. admin. ( 
+                                        2    
+                                        604800     
+                                        86400   
+                                        2419200    
+                                        604800 )      
+;
+@       IN      NS      dns.com.
+test.com. IN  A  192.168.2.120
+test.test.com. IN  A  192.168.2.121
+######################################################
+#             /etc/bind/zones/test.com.rev
+######################################################
+;
+; BIND reverse data file for local loopback interface
+;
+$TTL    604800
+@       IN      SOA     dns.com. admin. ( 
+                                        2    
+                                        604800     
+                                        86400   
+                                        2419200    
+                                        604800 )      
+;
+@       IN      NS     dns.com.
+120 IN  PTR  test.com.
+121    IN  PTR test.test.com.
+```
